@@ -41,12 +41,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Dnoo
+    uniqueID: 442333163
+    locked: 0
   - name: Background
     uniqueID: 4011584437
+    locked: 0
+  - name: miniTwierdza
+    uniqueID: 1126155715
     locked: 0
   - name: Foreground
     uniqueID: 4283724885
     locked: 0
   - name: Player
     uniqueID: 578363899
+    locked: 0
+  - name: "wie\u017Ca"
+    uniqueID: 118214619
     locked: 0
