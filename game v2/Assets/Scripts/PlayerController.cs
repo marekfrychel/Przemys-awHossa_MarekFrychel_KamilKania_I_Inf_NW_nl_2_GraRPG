@@ -1,20 +1,19 @@
+// PlayerController obs³uguje ruchy gracza, w tym interakcje z otoczeniem oraz system animacji.
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine;
 
-
-
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed;
+    public float moveSpeed; // Prêdkoœæ ruchu gracza
 
     private bool isMoving;
-
     private Vector2 input;
-
     private Animator animator;
 
+    // Warstwy wykorzystywane do sprawdzenia przeszkód i obiektów interaktywnych
     public LayerMask solidObjectsLayer;
     public LayerMask interactableLayer;
 
@@ -22,99 +21,76 @@ public class PlayerController : MonoBehaviour
     {
         // Pobiera komponent Animator przypisany do tego obiektu
         animator = GetComponent<Animator>();
-        //Debug.Log("Animator: " + animator);
     }
 
-    //Update jest wywo³ywany raz na klatkê
     public void HandleUpdate()
     {
-        // Przetwarzaj wejœcie tylko, jeœli gracz aktualnie siê nie porusza 
+        // Obs³uguje wejœcia tylko, gdy gracz nie porusza siê
         if (!isMoving)
         {
-            // Pobiera poziome wejœcia (lewo/prawo)
+            // Pobiera wejœcia poziome i pionowe
             input.x = Input.GetAxisRaw("Horizontal");
-            // Pobiera pionowe wejœci¹ (góra/dó³)
             input.y = Input.GetAxisRaw("Vertical");
 
-            // Jeœli jest wejœcie poziome, ustaw pionowe wejœcie na 0, aby zapobiec ruchowi diagonalnemu 
-            if (input.x != 0) input.y = 0;
-            // Jeœli istnieje jakieœ wejœcie ( nie jest wektorem zerowym), przejdŸ do logiki ruchu 
+            if (input.x != 0) input.y = 0; // Zapobiega ruchowi diagonalnemu
+
             if (input != Vector2.zero)
             {
-                // Ustaw parametry animacji w oparciu o kierunek wejœcia
+                // Ustawia kierunek animacji
                 animator.SetFloat("moveX", input.x);
                 animator.SetFloat("moveY", input.y);
 
-                //Debug.Log("This is input.x" + input.x);
-
-                // Oblicza docelow¹ pozycjê w oparciu o aktualn¹ pozycjê i kierunek wejœcia 
+                // Ustalanie docelowej pozycji na podstawie kierunku
                 var targetPos = transform.position;
-                // Dostosowuje docelow¹ pozycjê w kierunku x
                 targetPos.x += input.x;
-                // Dostosowuje docelow¹ pozycjê w kierunku y
                 targetPos.y += input.y;
 
-                // Sprawdza, czy docelowa pozycja jest przejezdna ( brak przeszkód )
+                // Sprawdza, czy docelowa pozycja jest przejezdna
                 if (IsWalkable(targetPos))
-                    // Rozpoczyna korutynê Move, aby poruszyæ gracza
-                    StartCoroutine(Move(targetPos));
-
-
-                
+                    StartCoroutine(Move(targetPos)); // Rozpocznij ruch
             }
         }
 
-        // Aktualizuje parametr isMoving animatora, aby odzwierciedliæ, czy gracz siê porusza 
-        animator.SetBool("isMoving", isMoving);
+        animator.SetBool("isMoving", isMoving); // Aktualizacja stanu animacji
 
         if (Input.GetKeyDown(KeyCode.Z))
-            Interact();
+            Interact(); // Wywo³anie interakcji, jeœli naciœniêto Z
     }
 
     void Interact()
     {
+        // Ustalanie kierunku interakcji
         var facingDir = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
         var interactPos = transform.position + facingDir;
 
         Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
 
+        // Sprawdzanie kolizji z obiektem interaktywnym
         var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
         if (collider != null)
         {
-            collider.GetComponent<Interactable>()?.Interact();
+            collider.GetComponent<Interactable>()?.Interact(); // Wywo³anie interakcji
         }
     }
-    // Korutyna do poruszania gracza do docelowej pozycji
+
     IEnumerator Move(Vector3 targetPos)
     {
-        // Ustawia isMoving na true, aby zapobiec nowym wejœciom podczas ruchu
         isMoving = true;
 
-        // Porusza siê w kierunku docelowej pozycji, dopóki odleg³oœæ nie bêdzie bardzo ma³a (sqrMagnitude > Mathf.Epsilon )
+        // Poruszanie gracza do docelowej pozycji
         while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
-            // Przesuwa gracza w kierunku docelowej pozycji za pomoc¹ Vector3.MoveTowards
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-            // Czeka na nastêpn¹ klatkê
             yield return null;
         }
-        // Ustawia pozycjê na docelow¹, aby upewniæ siê, ¿e gracz koñczy dok³adnie na docelowej pozycji.
+
         transform.position = targetPos;
-        // Pozwala na nowe wejœcia po osi¹gniêciu docelowej pozycji.
         isMoving = false;
     }
 
     private bool IsWalkable(Vector3 targetPos)
     {
-        // U¿ywa OverlapCircle, aby sprawdziæ, czy w ma³ym okrêgu wokó³ docelowej pozycji znajduj¹ siê jakiekolwiek kolidery.
-        // Jeœli znajd¹ siê jakiekolwiek kolidery w okreœlonych warstwach, pozycja nie jest przejezdna.
-        if (Physics2D.OverlapCircle(targetPos, 0.1f, solidObjectsLayer | interactableLayer) != null)
-        {
-            // Pozycja nie jest przejezdna
-            return false;
-        }
-        // Pozycja jest przejezdna
-        return true;
+        // Sprawdza, czy na docelowej pozycji nie ma przeszkód
+        return Physics2D.OverlapCircle(targetPos, 0.1f, solidObjectsLayer | interactableLayer) == null;
     }
-
 }
