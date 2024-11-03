@@ -6,9 +6,11 @@ using UnityEngine;
 
 public class ChallengerController : MonoBehaviour, Interactable
 {
+    [SerializeField] Dialog dialog;
     public void Interact()
     {
         // Wyœwietlenie komunikatu w konsoli po rozpoczêciu interakcji
-        Debug.Log("You will start a battle!");
+        //Debug.Log("You will start a battle!");
+        StartCoroutine(DialogManager.Instance.ShowDialog(dialog));
     }
 }
