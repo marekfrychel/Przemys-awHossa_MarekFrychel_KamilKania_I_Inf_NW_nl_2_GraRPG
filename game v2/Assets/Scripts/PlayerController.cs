@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     }
 
     //Update jest wywo³ywany raz na klatkê
-    private void Update()
+    public void HandleUpdate()
     {
         // Przetwarzaj wejœcie tylko, jeœli gracz aktualnie siê nie porusza 
         if (!isMoving)
