@@ -47,6 +47,9 @@ TagManager:
   - name: Background
     uniqueID: 4011584437
     locked: 0
+  - name: wyspa
+    uniqueID: 2350195663
+    locked: 0
   - name: miniTwierdza
     uniqueID: 1126155715
     locked: 0
