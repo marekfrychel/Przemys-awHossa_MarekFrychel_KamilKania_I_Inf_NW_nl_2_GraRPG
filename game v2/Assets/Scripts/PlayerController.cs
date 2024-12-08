@@ -1,13 +1,11 @@
-// PlayerController obs³uguje ruchy gracza, w tym interakcje z otoczeniem oraz system animacji.
-
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed; // Prêdkoœæ ruchu gracza
+    public float stepSize = 0.1f; // D³ugoœæ kroku (mniejsza wartoœæ = p³ynniejsze ruchy)
 
     private bool isMoving;
     private Vector2 input;
@@ -28,22 +26,22 @@ public class PlayerController : MonoBehaviour
         // Obs³uguje wejœcia tylko, gdy gracz nie porusza siê
         if (!isMoving)
         {
-            // Pobiera wejœcia poziome i pionowe
+            // Pobiera wejœcia poziome i pionowe (pozwala na ruch po skosie)
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
-
-            if (input.x != 0) input.y = 0; // Zapobiega ruchowi diagonalnemu
-
             if (input != Vector2.zero)
             {
+                // Normalizacja wektora, aby zachowaæ równ¹ prêdkoœæ we wszystkich kierunkach
+                input.Normalize();
+
                 // Ustawia kierunek animacji
                 animator.SetFloat("moveX", input.x);
                 animator.SetFloat("moveY", input.y);
 
                 // Ustalanie docelowej pozycji na podstawie kierunku
                 var targetPos = transform.position;
-                targetPos.x += input.x;
-                targetPos.y += input.y;
+                targetPos.x += input.x * stepSize;
+                targetPos.y += input.y * stepSize;
 
                 // Sprawdza, czy docelowa pozycja jest przejezdna
                 if (IsWalkable(targetPos))
@@ -80,6 +78,7 @@ public class PlayerController : MonoBehaviour
         // Poruszanie gracza do docelowej pozycji
         while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
+            // Przesuwamy gracza o mniejszy krok w kierunku celu
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
             yield return null;
         }
