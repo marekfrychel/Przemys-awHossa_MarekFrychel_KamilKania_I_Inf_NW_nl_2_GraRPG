@@ -1,5 +1,10 @@
+// GameController to centralny skrypt zarz¹dzaj¹cy stanem gry, który okreœla,
+// w jakim trybie znajduje siê gra (swobodna eksploracja, dialog lub walka)
+// i odpowiednio przekazuje kontrolê do innych skryptów, np. do obs³ugi gracza lub dialogów.
+
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // Wyliczenie stanów gry, aby ³atwo kontrolowaæ, czy gra jest w trybie eksploracji, dialogu, czy walki
@@ -32,7 +37,7 @@ public class GameController : MonoBehaviour
         // Obs³uguj logikê w zale¿noœci od stanu gry
         if (state == GameState.FreeRoam)
         {
-            // W trybie swobodnej eksploracji, Update() z PlayerController bêdzie obs³ugiwaæ ruch gracza
+            playerController.HandleUpdate();
         }
         else if (state == GameState.Dialog)
         {
@@ -44,3 +49,4 @@ public class GameController : MonoBehaviour
         }
     }
 }
+
