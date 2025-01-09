@@ -15,4 +15,12 @@ public class PlayerHit : MonoBehaviour
     {
         
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("breakable"))
+        {
+            other.GetComponent<Pot>().Smash(); // Ensure 'Pot' is the correct class name and attached to the GameObject
+        }
+    }
 }
