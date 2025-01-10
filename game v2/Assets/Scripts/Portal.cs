@@ -23,9 +23,9 @@ public class Portal : MonoBehaviour
             // Resetowanie animacji i ruchu gracza
             PlayerController playerController = collision.GetComponent<PlayerController>();
             if (playerController != null)
-            {
-                playerController.ResetInput(); // Resetowanie ruchu i animacji gracza
-            }
+            //{
+            //    playerController.ResetInput(); // Resetowanie ruchu i animacji gracza
+            //}
 
             Debug.Log("Gracz przeszed³ przez portal!");
         }
