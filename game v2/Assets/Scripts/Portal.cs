@@ -2,25 +2,32 @@ using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
-    public Transform destination; // Miejsce docelowe portalu
+    public Transform destination;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Coœ wesz³o do portalu: " + other.name); // Sprawdzamy, co wchodzi do portalu
-
-        if (other.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            Debug.Log("Gracz wchodzi do portalu.");
+            // Zatrzymanie gracza przed przeniesieniem
+            Rigidbody2D rb = collision.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero; // Zerowanie prêdkoœci
+                rb.angularVelocity = 0f;    // Zerowanie prêdkoœci obrotu
+                Debug.Log("Rigidbody2D prêdkoœæ i moment obrotowy zosta³y zresetowane.");
+            }
 
-            if (destination != null)
+            // Przenoszenie gracza do nowej pozycji
+            collision.transform.position = destination.position;
+
+            // Resetowanie animacji i ruchu gracza
+            PlayerController playerController = collision.GetComponent<PlayerController>();
+            if (playerController != null)
             {
-                other.transform.position = destination.position;
-                Debug.Log("Gracz zosta³ przeniesiony.");
+                playerController.ResetInput(); // Resetowanie ruchu i animacji gracza
             }
-            else
-            {
-                Debug.LogError("Nie ustawiono miejsca docelowego portalu!");
-            }
+
+            Debug.Log("Gracz przeszed³ przez portal!");
         }
     }
 }
