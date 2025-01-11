@@ -26,4 +26,5 @@ public class Pot : MonoBehaviour
         yield return new WaitForSeconds(.3f);
         this.gameObject.SetActive(false);
     }
+   
 }

@@ -2,27 +2,35 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
+    public EnemyCounter enemyCounter; // Przypisz GameObject z EnemyCounter w Inspectorze
+    public GameObject explosionPrefab; // Prefabrykat wybuchu
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
-            // Pobierz Animator przeciwnika
-            Animator enemyAnimator = collision.GetComponent<Animator>();
+            // Instancjuj animacjê wybuchu
+            if (explosionPrefab != null)
+            {
+                Instantiate(explosionPrefab, collision.transform.position, Quaternion.identity);
+            }
 
+            // Obs³uga animacji i zniszczenia przeciwnika
+            Animator enemyAnimator = collision.GetComponent<Animator>();
             if (enemyAnimator != null)
             {
-                // Wywo³aj animacjê umierania
                 enemyAnimator.SetTrigger("Die");
+                Destroy(collision.gameObject); // Opcjonalnie opóŸnienie
+            }
+            else
+            {
+                Destroy(collision.gameObject);
+            }
 
-                // Wy³¹cz Collider, ¿eby przeciwnik nie reagowa³ dalej
-                Collider2D enemyCollider = collision.GetComponent<Collider2D>();
-                if (enemyCollider != null)
-                {
-                    enemyCollider.enabled = false;
-                }
-
-                // Zniszcz przeciwnika po zakoñczeniu animacji
-                Destroy(collision.gameObject, enemyAnimator.GetCurrentAnimatorStateInfo(0).length);
+            // Aktualizuj licznik zabitych przeciwników
+            if (enemyCounter != null)
+            {
+                enemyCounter.EnemyKilled();
             }
         }
     }
